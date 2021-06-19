@@ -1,10 +1,23 @@
 from typing import List
 from fastapi import FastAPI, File, UploadFile
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, Response, StreamingResponse
 import aiofiles 
 import mimetypes
 
 app = FastAPI()
+origins = [
+    "http://localhost:3000"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
 upload_directory = "/Users/apu/ExperimentLab/uploads/binary-service/"
 
 
@@ -18,7 +31,7 @@ async def create_upload_files(files: List[UploadFile] = File(...)):
     for file in files:
         await save_file(file)
 
-    return Response(content="{\"message\": \"File saved\"}", media_type="application/json", headers={"link": f"http://localhost:8000/files/{files[0].filename}"})
+    return Response(content="{\"message\": \"File saved\"}", media_type="application/json", headers={"Link": f"http://localhost:8000/files/{files[0].filename}"})
 
 
 @app.get("/files/{file_name}")
